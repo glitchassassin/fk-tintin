@@ -1,0 +1,39 @@
+#nop This script tracks the duration of your polymorph spells, so you can
+#nop trigger an alert before it's due to wear off.
+
+
+#nop This tracks whether extend spell is on or off.
+#action {Extend spell mode set to %1.} {#var extend_mode %1}
+
+
+#nop When you polymorph, this action kicks off a 5-minute and 2-minute warning
+#nop on a delay. The time here is hard-coded, based on my main character with
+#nop polymorph. You'll need to discover your own values by experimentation.
+
+#action {Your shape slowly changes into} {
+#var polymorph_extended $extend_mode; 
+#format polymorph_start {%T}; 
+#if {$polymorph_extended} {
+#delay {polywarn1} {#bell; #echo {Polymorph wearing off in 5 minutes!}} {1140};
+#delay {polywarn2} {#bell; #echo {Polymorph wearing off in 2 minutes!}} {1320};
+};
+#else {
+#delay {polywarn1} {#bell; #echo {Polymorph wearing off in 5 minutes!}} {420};
+#delay {polywarn2} {#bell; #echo {Polymorph wearing off in 2 minutes!}} {600};
+}
+}
+
+
+#nop When you revert (whether naturally or by REVERTing), the script cancels any
+#nop remaining warning timers and displays the length of time you were polymorphed
+#nop (as well as whether or not extend spell mode was on).
+
+#action {Your shape slowly reverts to} {
+#format polymorph_done {%T};
+#math ptime {$polymorph_done - $polymorph_start};
+#undelay {polywarn1};
+#undelay {polywarn2};
+#delay {1} {
+#echo {Reverted after $ptime seconds. Extend spell mode was $polymorph_extended.}
+}
+}

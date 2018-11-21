@@ -1,0 +1,24 @@
+#nop NOP (for "no operation") is a comment - these will explain the commands in the file.
+
+#nop This connects to the server and logs in automatically. Fill in your own username and password, of course.
+#alias {reconnect} {#ses Forgotten_Kingdoms forgottenkingdoms.org 4000;USERNAME;PASSWORD} 
+
+#nop This loads other useful scripts when the program starts.
+#event {PROGRAM START} {reconnect; #read LOGGING.tin; #read polymorph.tin;}
+
+#nop Here I set up some bell notifications for important events, like stoneskin wearing off,
+#nop being disarmed, or being attacked (important if you're playing at work, not that I'd
+#nop ever do that!)
+#action {^Your skin feels soft again.$} {#bell}
+#action {^%1 DISARMS you!$} {#bell}
+#action {approaches you and prepares to engage you in combat!} {#bell}
+
+#nop On Mac, you can send actual system notifications with the `osascript` command. I set these
+#nop up to catch skillups and tells, and to let me know when brewing/etc. is finished.
+#action {^You learn from your success and %1$} {#system osascript -e 'display notification "%1" with title "Skillup"'}
+#action {^You finish %1.$} {#system osascript -e 'display notification "%1" with title "Crafting finished"'}
+#action {^%1 {tells|replies to} you %2$} {#system osascript -e 'display notification "from %1" with title "Tell"'}
+#action {^%1 {tells|replies to} you, OOC %2$} {#system osascript -e 'display notification "from %1" with title "OTell"'}
+
+#nop This kills the session automatically when the server disconnects.
+#action {^A strange voice says, 'We await your return, %0...'}{#zap}

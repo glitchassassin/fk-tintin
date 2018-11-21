@@ -1,0 +1,59 @@
+#nop This script was provided by someone on the forums (though I can't find the
+#nop original post now).
+
+#nop Usage:
+#nop Begins logging to {logpath} when you choose a character to play.
+#nop Use `-log` to disable logging, or `+log` to re-enable it.
+#nop Note that if you reconnect to a session in progress, the script can't pick
+#nop up the character's name, and so doesn't start logging again. To trigger it
+#nop manually, you can use the following tintin++ command:
+#nop `#showme You have chosen to play [character].`
+
+#var {charname}{blank}
+#var {logpath}{FK/Logs}
+#var {logfile}{blank}
+#var {logging}{off}
+
+
+#nop Captures the current character name, starts logging to a date-stamped file 
+#nop specific to that character, and also launches the trainers script (since
+#nop it's character-specific).
+
+#action {^You have chosen to play %0.$}
+{
+#log off;
+#var {logging} {off};
+#var {logging} {on};
+#var {charname}{%0};
+#format {logfile} {$logpath/%t.html} {%Y-%m-%d-$charname};
+#config log html;
+#log append $logfile;
+#showme Logging is now active to $logfile.;
+#read trainers.tin;
+}
+
+
+#nop This alias is designed to turn logging on, based on last entered character name.
+#alias {+log}
+{
+#if {"$logging" != "on"}
+{
+#format {logfile} {$logpath/%t.html} {%Y-%m-%d-$charname};
+#config log html;
+#log append $logfile;
+#showme Logging is now active to $logfile.
+};
+#else
+{
+#showme {Logging is already active. Please disengage via '-log' before trying to '+log'}
+}
+}
+
+
+#nop This alias is designed to turn logging off, without condition.
+#alias {-log}
+{
+#showme {Logging is now disabled.};
+#log off;
+#var logging off;
+}
